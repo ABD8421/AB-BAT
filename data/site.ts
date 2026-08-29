@@ -5,6 +5,24 @@
  * Nothing in this file may be invented — if a fact is unknown, leave the
  * bracketed token in place and the UI will mark it as unverified.
  */
+const DEFAULT_SITE_URL = "http://localhost:3000";
+
+/**
+ * Returns a valid absolute URL for `metadataBase`.
+ * Guards against the env var being unset, an empty string, whitespace, or an
+ * otherwise invalid value (any of which would make `new URL()` throw and break
+ * the production build).
+ */
+function normalizeSiteUrl(raw: string | undefined): string {
+  const value = raw?.trim();
+  if (!value) return DEFAULT_SITE_URL;
+  try {
+    return new URL(value).toString().replace(/\/$/, "");
+  } catch {
+    return DEFAULT_SITE_URL;
+  }
+}
+
 export const site = {
   name: "Abdullah Al Anser",
   shortName: "ANSER",
@@ -33,7 +51,7 @@ export const site = {
   /** Place the real file at public/resume/abdullah-al-anser-cv.pdf before launch. */
   resumePath: "/resume/abdullah-al-anser-cv.pdf",
 
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  url: normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL),
 } as const;
 
 export const navSections = [
