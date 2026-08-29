@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import Script from "next/script";
 import "./globals.css";
 
 import { Nav } from "@/components/navigation/Nav";
@@ -70,11 +69,22 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" data-theme="dark" suppressHydrationWarning>
       <head>
-        <Script src="/theme-init.js" strategy="beforeInteractive" />
+        {/* Applies the saved/system theme before first paint (no flash).
+            Inlined as head markup — rather than an external <script src> or
+            next/script — because the preview harness injects its own inline
+            script into <head>, and reconciling that against an external src
+            script produced a hydration mismatch. The CSP allows inline
+            scripts via 'unsafe-inline' (see next.config.ts). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{var s=localStorage.getItem("theme");var t=s==="light"||s==="dark"?s:(window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark");document.documentElement.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","dark")}',
+          }}
+        />
         <script
           type="application/ld+json"
           // Static, build-time JSON produced from local data — no user input
-          // reaches this string, and the CSP allows it by hash (see proxy.ts).
+          // reaches this string, and the CSP allows it by 'unsafe-inline'.
           dangerouslySetInnerHTML={{ __html: buildPersonJsonLd() }}
         />
       </head>
