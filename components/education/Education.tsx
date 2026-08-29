@@ -24,8 +24,8 @@ export function Education() {
                 <>
                   <p className="meta" style={{ marginTop: "0.5rem" }}>Coursework</p>
                   <ul className="card__tags" style={{ marginTop: 0 }}>
-                    {item.coursework.map((course) => (
-                      <li key={course} className="tag">{course}</li>
+                    {item.coursework.map((course, i) => (
+                      <li key={`${i}-${course}`} className="tag">{course}</li>
                     ))}
                   </ul>
                 </>

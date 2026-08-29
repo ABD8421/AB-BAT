@@ -57,8 +57,8 @@ export function Experience() {
                 ) : null}
 
                 <ul className="card__tags">
-                  {item.technologies.map((tech) => (
-                    <li key={tech} className="tag">{tech}</li>
+                  {item.technologies.map((tech, i) => (
+                    <li key={`${i}-${tech}`} className="tag">{tech}</li>
                   ))}
                 </ul>
               </div>
