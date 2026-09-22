@@ -1,5 +1,6 @@
 import { Section } from "@/components/ui/Section";
-import { getGitHubSnapshot } from "@/lib/github";
+import { getGitHubSnapshot, isGitHubConfigured } from "@/lib/github";
+import { site } from "@/data/site";
 import { externalLinkProps } from "@/lib/utils";
 
 /**
@@ -11,6 +12,8 @@ import { externalLinkProps } from "@/lib/utils";
  */
 export async function GitHubPanel() {
   const snapshot = await getGitHubSnapshot();
+  const configured = isGitHubConfigured();
+  const username = site.githubUsername.trim();
 
   return (
     <Section
@@ -21,10 +24,20 @@ export async function GitHubPanel() {
       lede="Live from the GitHub REST API, cached for an hour."
     >
       {!snapshot.ok || !snapshot.profile ? (
-        <p className="gallery__empty">
-          GitHub activity is unavailable right now. Set GITHUB_USERNAME to enable this section, or
-          try again later — the API may be rate-limited.
-        </p>
+        <div className="stack">
+          <p className="gallery__empty">
+            {configured
+              ? "Live GitHub data could not be loaded right now — the public API is likely rate-limited. The profile is still reachable directly."
+              : "No GitHub handle is configured, so this section is switched off. Set GITHUB_USERNAME to enable it."}
+          </p>
+          {configured ? (
+            <p style={{ margin: 0 }}>
+              <a href={`https://github.com/${username}`} className="btn" {...externalLinkProps}>
+                Open github.com/{username}
+              </a>
+            </p>
+          ) : null}
+        </div>
       ) : (
         <div className="stack">
           <dl className="hero__stats" style={{ marginTop: 0 }}>

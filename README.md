@@ -291,6 +291,14 @@ it up.
    defaulted to `ABD8421` in `data/site.ts`), optionally `GITHUB_TOKEN`
    (fine-grained, public repos, read-only), and `RESEND_API_KEY` /
    `CONTACT_TO_EMAIL` / `CONTACT_FROM_EMAIL`.
+
+   **On the open-source section.** An empty `GITHUB_USERNAME` in the hosting
+   dashboard is treated as "not set", not as "switch this off" — only setting
+   `DEFAULT_GITHUB_USERNAME = ""` in `data/site.ts` disables the section.
+   Without a token, the GitHub API allows 60 requests/hour *per IP*, and build
+   machines and serverless functions share IPs, so the section will sometimes
+   fall back to a plain profile link. Add the read-only `GITHUB_TOKEN` to raise
+   that to 5,000/hour and make the live figures reliable.
 4. Attach the domain, confirm HTTPS, and enable registrar MFA.
 5. For a custom sending domain, configure SPF, DKIM and DMARC at the DNS level.
 6. Never use production credentials locally.
