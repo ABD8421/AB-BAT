@@ -14,8 +14,8 @@ These were run in the environment where the project was generated:
 | Check | Result |
 | --- | --- |
 | `npx tsc --noEmit` | passes, `strict` + `noUncheckedIndexedAccess`, zero `any` |
-| `npx next build` | succeeds — 13 routes, all pages statically prerendered |
-| `next start` + HTTP checks | every route returns the expected status |
+| `npx next build` | succeeds — 18 pages, every one statically prerendered |
+| `next dev` + HTTP checks | `/`, `/projects`, all 8 case files, `/resume`, `/terminal`, `/sitemap.xml`, `/robots.txt` all return 200 |
 | Security headers | present on responses, verified with `curl -I` |
 | `/api/contact` | 405 non-POST · 422 invalid · 429 after 3 posts / 10 min · 200 honeypot · 503 unconfigured |
 | Unknown case slug | 404 with the scoped not-found page |
@@ -49,7 +49,7 @@ App Router throughout. Every technique here is load-bearing, not decorative.
 | --- | --- | --- |
 | `/` | Static | The full narrative: hero → about → skills → case files → experience → education → credentials → services → GitHub → contact |
 | `/projects` | Static | Full archive with URL-synced filtering |
-| `/projects/[slug]` | SSG via `generateStaticParams` | One page per case file, `generateMetadata` per project, `notFound()` for unknown slugs |
+| `/projects/[slug]` | SSG via `generateStaticParams` | One page per case file (8 today, each linked to its repository), `generateMetadata` per project, `notFound()` for unknown slugs |
 | `/resume` | Static | Developer dossier + PDF download |
 | `/terminal` | Static | Simulated command interface, `noindex` |
 | `/api/contact` | Dynamic route handler | POST only |
@@ -133,14 +133,46 @@ and impossible to ship by accident.
 
 Concretely, these are placeholders and must be replaced or deleted:
 
-- all three projects in `data/projects.ts`, including the case study
+- the email address and LinkedIn URL in `data/site.ts` — the only two facts no
+  repository can supply
 - the single entry in `data/experience.ts` — **delete it if you have no
   professional roles yet**; the section hides itself when the array is empty
 - `data/education.ts`, `data/certificates.ts` (certificates and achievements)
-- the biography and "how I work" copy in `components/about/About.tsx`
-- the summary in `app/resume/page.tsx`
-- email and social links in `data/site.ts`
 - the portrait frame in `About` and the résumé PDF at `public/resume/`
+
+**What is no longer a placeholder.** The three invented case files are gone.
+`data/projects.ts` now holds eight case files, each one a real repository owned
+by `ABD8421` and each one linking to its own source:
+
+| # | Case file | Category | Repository |
+| --- | --- | --- | --- |
+| 001 | Image Compressor with Quality Evaluation | web | `Image-Compression` |
+| 002 | Byte Blaze — Blog Reader | web | `byte-blaze` |
+| 003 | Bus Ticket Booking Interface | web | `bus-ticket` |
+| 004 | Simple Diet App | mobile | `simple-diet-app` |
+| 005 | API Image Viewer | mobile | `api-image-image` |
+| 006 | Library Management System | desktop | `LibraryManagement` |
+| 007 | Salary Calculation with Unit Tests | academic | `salary-unit-test` |
+| 008 | GenZ Fashion Landing Page | academic | `genZ` |
+
+Each case study was written from the repository contents — the file tree, the
+dependencies, the queries, the test cases — not from the repository description
+alone. Where a brief claimed more than the code does (the bus-ticket brief
+mentions online payments; the code is a booking interface with a displayed
+total), the case study says what was actually built. Several entries end with
+what they would change now, including the one that is genuinely uncomfortable
+(string-concatenated SQL in the library system). That honesty is the point:
+an interviewer who opens the repository will find the same thing.
+
+`data/site.ts` now carries the real GitHub handle (`ABD8421`) and the deployed
+origin (`https://ab-bat.vercel.app`, used when `NEXT_PUBLIC_SITE_URL` is unset
+in production). `GITHUB_USERNAME` defaults to that handle, so the open-source
+section renders live data without any environment variable.
+
+The biography in `components/about/About.tsx` and the summary in
+`app/resume/page.tsx` are written only from facts already in the data files.
+They are a starting point in a neutral voice — a portfolio bio reads like one
+when someone else writes it, so rewrite both before launch.
 
 Skill **levels** in `data/skills.ts` are guesses set to a conservative default.
 Review every one. The technology list itself came from your brief.
@@ -224,7 +256,7 @@ time. It can never trap anyone.
 
 ## Performance (§45, §46)
 
-All 13 routes prerender to static HTML. The only JavaScript that ships is the
+All 18 pages prerender to static HTML. The only JavaScript that ships is the
 nav, theme toggle, boot sequence, reveal observer, filter, form and terminal.
 The rain canvas is `next/dynamic` and self-disables under reduced motion, below
 900px, or on 4-or-fewer cores. It stops when the tab is hidden. The 3D tier
@@ -252,10 +284,13 @@ it up.
 ## Deployment
 
 1. Push to GitHub. Confirm `.env.local` is **not** in the repository.
-2. Import into Vercel. Set `NEXT_PUBLIC_SITE_URL` to the real domain.
-3. Add server-side variables per environment: `GITHUB_USERNAME`, optionally
-   `GITHUB_TOKEN` (fine-grained, public repos, read-only), and
-   `RESEND_API_KEY` / `CONTACT_TO_EMAIL` / `CONTACT_FROM_EMAIL`.
+2. Import into Vercel. Set `NEXT_PUBLIC_SITE_URL` to the real domain — the
+   deployed origin is `https://ab-bat.vercel.app`. If it is unset in production
+   the code falls back to that origin rather than to localhost.
+3. Add server-side variables per environment: `GITHUB_USERNAME` (already
+   defaulted to `ABD8421` in `data/site.ts`), optionally `GITHUB_TOKEN`
+   (fine-grained, public repos, read-only), and `RESEND_API_KEY` /
+   `CONTACT_TO_EMAIL` / `CONTACT_FROM_EMAIL`.
 4. Attach the domain, confirm HTTPS, and enable registrar MFA.
 5. For a custom sending domain, configure SPF, DKIM and DMARC at the DNS level.
 6. Never use production credentials locally.
@@ -268,11 +303,14 @@ the call is one `fetch` in the route handler.
 
 ## Before you launch
 
-- [ ] Replace every bracketed placeholder — search the repo for `[` in `data/`
-- [ ] Delete any section you cannot fill honestly
+- [x] Case files: eight real projects, each linked to its own repository
+- [ ] Replace the remaining bracketed placeholders — `grep -rn "\[" data/ components/ app/`
+- [ ] Delete any section you cannot fill honestly (including the experience entry
+      if there are no professional roles yet)
 - [ ] Review every skill level
-- [ ] Add the real résumé PDF at `public/resume/`
-- [ ] Add a portrait and swap the About frame for `next/image`
+- [ ] Rewrite the biography in `About.tsx` and the résumé summary in your own voice
+- [ ] Add the real résumé PDF at `public/resume/` (both buttons 404 until then)
+- [ ] Add a portrait at `public/images/portrait.jpg` and swap the About frame for `next/image`
 - [ ] Move the rate limiter to a shared store
 - [ ] Run Lighthouse on mobile throttling; targets are 90+ / 95+ / 95+ / 95+
 - [ ] Test at 320, 375, 390, 430, 768, 1024, 1440, 1920
@@ -289,6 +327,3 @@ the call is one `fetch` in the route handler.
   404 and the server stays healthy; the log line is framework-internal.
 - Light mode is implemented as a token swap and passes contrast by calculation,
   but it has not been reviewed visually.
-"# AB-BAT" 
-"# AB-BAT" 
-"# AB-BAT" 
