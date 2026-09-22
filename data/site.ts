@@ -15,6 +15,12 @@ const DEV_SITE_URL = "http://localhost:3000";
 const PRODUCTION_SITE_URL = "https://ab-bat.vercel.app";
 
 /**
+ * Handle used when GITHUB_USERNAME is unset or empty.
+ * Set this to an empty string to switch the open-source section off entirely.
+ */
+const DEFAULT_GITHUB_USERNAME = "ABD8421";
+
+/**
  * The URL to fall back to when NEXT_PUBLIC_SITE_URL is missing or malformed.
  * In production the real origin matters: metadataBase, the Open Graph URLs,
  * sitemap.xml and robots.txt are all built from it, and a localhost fallback
@@ -63,11 +69,15 @@ export const site = {
   },
 
   /**
-   * GitHub handle used by lib/github.ts. Empty string disables the section.
-   * The owner's handle is the default so the section works without a Vercel
-   * environment variable; set GITHUB_USERNAME to override it.
+   * GitHub handle used by lib/github.ts. An empty string disables the section.
+   *
+   * `??` alone is not enough here: hosting dashboards frequently hold an
+   * environment variable that exists but is empty, and an empty string is not
+   * nullish, so it would win over the default and switch the section off. Trim
+   * first, then fall back — an empty or whitespace-only value means "not set".
+   * To disable the section deliberately, set DEFAULT_GITHUB_USERNAME to "".
    */
-  githubUsername: process.env.GITHUB_USERNAME ?? "ABD8421",
+  githubUsername: (process.env.GITHUB_USERNAME ?? "").trim() || DEFAULT_GITHUB_USERNAME,
 
   /** Place the real file at public/resume/abdullah-al-anser-cv.pdf before launch. */
   resumePath: "/resume/abdullah-al-anser-cv.pdf",

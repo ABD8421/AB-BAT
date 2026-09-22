@@ -65,8 +65,13 @@ interface RawRepo {
 
 const EMPTY: GitHubSnapshot = { ok: false, profile: null, repos: [], languages: [] };
 
+/** True when a handle is configured, whatever the source. */
+export function isGitHubConfigured(): boolean {
+  return site.githubUsername.trim().length > 0;
+}
+
 export async function getGitHubSnapshot(): Promise<GitHubSnapshot> {
-  const username = site.githubUsername;
+  const username = site.githubUsername.trim();
   if (!username) return EMPTY;
 
   const [rawProfile, rawRepos] = await Promise.all([
