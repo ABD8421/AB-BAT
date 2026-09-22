@@ -7,6 +7,10 @@ import { site } from "@/data/site";
  * The photograph slot is intentionally an empty frame until a real image
  * exists at public/images/portrait.jpg — a fake stock portrait would
  * undermine everything else on the page.
+ *
+ * The biography below is written only from facts already in the data files
+ * (role, focus, location, the case files and the stack). It is a starting
+ * point, not a finished voice — rewrite it in your own words before launch.
  */
 export function About() {
   return (
@@ -26,8 +30,9 @@ export function About() {
             >
               <p className="meta" style={{ margin: 0 }}>Portrait</p>
               <p style={{ fontSize: "0.85rem", margin: 0 }}>
-                Add public/images/portrait.jpg, then swap this block for
-                next/image with width, height and alt text.
+                Deliberately empty. Add public/images/portrait.jpg and swap this block for
+                next/image with width, height and alt text — a stock photograph would be the
+                only untrue thing on the page.
               </p>
             </div>
             <p className="meta" style={{ margin: 0 }}>{site.location}</p>
@@ -39,9 +44,18 @@ export function About() {
             <div>
               <h3 style={{ fontSize: "var(--step-2)" }}>Full stack developer</h3>
               <p style={{ color: "var(--text-dim)" }}>
-                [BIOGRAPHY — two short paragraphs in your own voice. What you build, what you
-                are strongest at, and what kind of problem you want next. Write it yourself;
-                a portfolio bio written by someone else reads like one.]
+                I am a full stack developer based in {site.location}, working across web, mobile
+                and backend. React and Next.js for interfaces, Node.js and REST APIs on the
+                server, Flutter when the work has to leave the browser, and SQL or document
+                databases underneath. The case files above are the work I would put in front of
+                someone first, and every one of them links to the source it was built from.
+              </p>
+              <p style={{ color: "var(--text-dim)" }}>
+                I work best on problems where the data model decides the shape of the solution. On
+                this site that principle is taken literally: the projects, the statistics, the
+                skills and the résumé are all generated from a handful of typed data files, so a
+                fact appears in exactly one place and the page cannot claim something the data
+                does not contain.
               </p>
             </div>
 

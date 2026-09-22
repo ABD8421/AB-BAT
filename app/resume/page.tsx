@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { site } from "@/data/site";
 import { skills } from "@/data/skills";
 import { projects } from "@/data/projects";
@@ -6,6 +7,7 @@ import { experience } from "@/data/experience";
 import { education } from "@/data/education";
 import { certificates } from "@/data/certificates";
 import { Unverified } from "@/components/ui/Unverified";
+import { externalLinkProps, isPlaceholderText } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Developer dossier",
@@ -42,9 +44,40 @@ export default function ResumePage() {
       <div className="stack">
         <Block title="Professional summary">
           <p>
-            [SUMMARY — three or four lines. What you build, the stack you are strongest in, and the
-            kind of role you want.]
+            Full stack developer based in {site.location}, working across web, mobile and backend:
+            React and Next.js for interfaces, Node.js and REST APIs on the server, Flutter for
+            cross-platform applications, and SQL or document databases underneath. Comfortable
+            owning a feature from data model to interface — schema, endpoints, validation, state
+            and the deployed build. The case files in this dossier are the honest record of what I
+            have built so far, and each one links to its source.
           </p>
+        </Block>
+
+        <Block title="Profiles">
+          <ul className="list-check">
+            <li>
+              GitHub —{" "}
+              <a href={site.links.github} {...externalLinkProps}>{site.links.github}</a>
+            </li>
+            <li>
+              Email —{" "}
+              {isPlaceholderText(site.email) ? (
+                <span>{site.email} <span className="flag-unverified">Replace</span></span>
+              ) : (
+                <a href={`mailto:${site.email}`}>{site.email}</a>
+              )}
+            </li>
+            {site.links.linkedin ? (
+              <li>
+                LinkedIn —{" "}
+                {isPlaceholderText(site.links.linkedin) ? (
+                  <span>{site.links.linkedin} <span className="flag-unverified">Replace</span></span>
+                ) : (
+                  <a href={site.links.linkedin} {...externalLinkProps}>{site.links.linkedin}</a>
+                )}
+              </li>
+            ) : null}
+          </ul>
         </Block>
 
         <Block title="Skills">
@@ -89,7 +122,11 @@ export default function ResumePage() {
           <ul className="list-check">
             {projects.map((project) => (
               <li key={project.slug}>
-                #{project.caseNumber} <Unverified value={project.title} /> — {project.tech.join(", ")}
+                #{project.caseNumber}{" "}
+                <Link href={`/projects/${project.slug}`}>
+                  <Unverified value={project.title} />
+                </Link>{" "}
+                — {project.tech.join(", ")}
               </li>
             ))}
           </ul>

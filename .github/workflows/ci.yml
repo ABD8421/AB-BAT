@@ -38,7 +38,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          NEXT_PUBLIC_SITE_URL: https://AB-BAT.com
+          NEXT_PUBLIC_SITE_URL: https://ab-bat.vercel.app
 
 # Notes:
 # - No secret is referenced here, so a fork PR cannot reach one.
